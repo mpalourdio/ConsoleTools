@@ -1,0 +1,82 @@
+<?php
+/*
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+ * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+namespace ConsoleToolsTests\Symlink\Commands;
+
+use ConsoleTools\Symlink\Commands\GenerateSymlinksCommand;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
+
+class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
+{
+    public function testSymlinkMandatoryOption()
+    {
+        $application = new Application();
+        $application->add(new GenerateSymlinksCommand());
+
+        $command       = $application->find('symlink:generate');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command' => $command->getName(),
+            '-c'      => 'root',
+        ]);
+
+        $this->assertRegExp('/Templates dir : root/', $commandTester->getDisplay());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testNoRootThrowsException()
+    {
+        $application = new Application();
+        $application->add(new GenerateSymlinksCommand());
+
+        $command       = $application->find('symlink:generate');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command' => $command->getName(),
+        ]);
+    }
+
+    public function testSymlinkSpecificParam()
+    {
+        $application = new Application();
+        $application->add(new GenerateSymlinksCommand());
+
+        $command = $application->find('symlink:generate');
+        //var_dump($command->getName());die();
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command' => $command->getName(),
+            '-c'      => 'root',
+            '-p'      => ['linux'],
+        ]);
+
+        $this->assertRegExp('/linux/', $commandTester->getDisplay());
+    }
+
+    public function testSymlinkAMoreThanOneParams()
+    {
+        $application = new Application();
+        $application->add(new GenerateSymlinksCommand());
+
+        $command = $application->find('symlink:generate');
+        //var_dump($command->getName());die();
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'command' => $command->getName(),
+            '-c'      => 'root',
+            '-p'      => ['linux', 'gnu'],
+        ]);
+
+        $this->assertRegExp('/linux && gnu/', $commandTester->getDisplay());
+    }
+}
