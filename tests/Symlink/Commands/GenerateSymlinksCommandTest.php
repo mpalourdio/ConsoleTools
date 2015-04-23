@@ -46,13 +46,12 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         ]);
     }
 
-    public function testSymlinkSpecificParam()
+    public function testSymlinkOneSpecificParam()
     {
         $application = new Application();
         $application->add(new GenerateSymlinksCommand());
 
         $command = $application->find('symlink:generate');
-        //var_dump($command->getName());die();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName(),
@@ -63,13 +62,12 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('/linux/', $commandTester->getDisplay());
     }
 
-    public function testSymlinkAMoreThanOneParams()
+    public function testSymlinkMoreThanOneParam()
     {
         $application = new Application();
         $application->add(new GenerateSymlinksCommand());
 
         $command = $application->find('symlink:generate');
-        //var_dump($command->getName());die();
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName(),
