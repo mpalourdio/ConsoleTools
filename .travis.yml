@@ -16,6 +16,7 @@ matrix:
 
 script:
   - ./vendor/bin/phpcs --standard=PSR2 ./src/ ./tests/
+  - ./vendor/bin/phpunit --coverage-clover=coverage.clover
 
 before_script:
   - composer self-update
