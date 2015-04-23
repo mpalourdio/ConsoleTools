@@ -12,5 +12,5 @@ namespace ConsoleTools\Symlink\Generator;
 
 final class GenerateSymlinks
 {
-//@todo
+    //@todo
 }

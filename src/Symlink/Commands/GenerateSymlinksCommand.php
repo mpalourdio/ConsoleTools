@@ -32,13 +32,13 @@ class GenerateSymlinksCommand extends Command
                 new InputOption(
                     'project',
                     'p',
-                    InputOption::VALUE_IS_ARRAY|InputOption::VALUE_OPTIONAL,
+                    InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                     '"*" ou un/des répertoire(s) de projet',
                     ['*']
                 ),
             ])
             ->setHelp(
-'Crée les symlinks pour les dossiers de templates d\'un ou des projets
+                'Crée les symlinks pour les dossiers de templates d\'un ou des projets
 
 Utilisation:
 
@@ -60,15 +60,19 @@ Utilisation:
         $headerStyle = new OutputFormatterStyle('white', 'green', ['bold']);
         $output->getFormatter()->setStyle('header', $headerStyle);
 
-        $project = $input->getOption('project');
-        $rootPath  = $input->getOption('chemin');
+        $project  = $input->getOption('project');
+        $rootPath = $input->getOption('chemin');
         if ($rootPath === null) {
             throw new \Exception(
-                'Vous devez spécifier la racine de Templates avec l\'option "-c". Ex -> symlink:generate -c /home/moi/eform/Templates'
+                'Vous devez spécifier la racine de Templates avec l\'option "-c" ou "--chemin"'
             );
         }
 
-        $output->writeln('<header>Génération des symlinks pour "' . implode(' && ', $project) . '" -> Templates dir : ' . $rootPath . '</header>');
+        $output->writeln(
+            '<header>Génération des symlinks pour "' . implode(' && ', $project) . '" -> Templates dir : '
+            . $rootPath
+            . '</header>'
+        );
 
         $output->writeln('<header>Fini ? Ca joue le chalet ou bien ?</header>');
     }
