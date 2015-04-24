@@ -16,12 +16,26 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
 {
+    private function getQuestionHelperMockSetToFalse()
+    {
+        $dialog = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper', ['askConfirmation']);
+        $dialog->expects($this->any())
+            ->method('askConfirmation')
+            ->will($this->returnValue(false));
+
+        return $dialog;
+    }
+
     public function testSymlinkMandatoryOption()
     {
         $application = new Application();
         $application->add(new GenerateSymlinksCommand());
 
-        $command       = $application->find('symlink:generate');
+        $command = $application->find('symlink:generate');
+
+
+        $command->getHelperSet()->set($this->getQuestionHelperMockSetToFalse(), 'dialog');
+
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName(),
@@ -52,12 +66,28 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         $application->add(new GenerateSymlinksCommand());
 
         $command = $application->find('symlink:generate');
+        $command->getHelperSet()->set($this->getQuestionHelperMockSetToFalse(), 'dialog');
+
+        $symlink = $this
+            ->getMockBuilder('ConsoleTools\Symlink\Generator\GenerateSymlinks')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $symlink->expects($this->any())
+            ->method('process')
+            ->will($this->returnValue(true));
+
+        $symlink->expects($this->any())
+            ->method('getAllDirsToTraverse')
+            ->will($this->returnValue(true));
+
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName(),
             '-c'      => 'root',
             '-p'      => ['linux'],
         ]);
+
 
         $this->assertRegExp('/linux/', $commandTester->getDisplay());
     }
@@ -68,6 +98,8 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         $application->add(new GenerateSymlinksCommand());
 
         $command = $application->find('symlink:generate');
+        $command->getHelperSet()->set($this->getQuestionHelperMockSetToFalse(), 'dialog');
+
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName(),
