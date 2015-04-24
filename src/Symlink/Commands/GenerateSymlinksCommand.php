@@ -10,6 +10,7 @@
 
 namespace ConsoleTools\Symlink\Commands;
 
+use ConsoleTools\Symlink\Generator\GenerateSymlinks;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -73,6 +74,11 @@ Utilisation:
             . $rootPath
             . '</header>'
         );
+
+        if ($this->getHelper('dialog')->askConfirmation($output, "Continuer? (y/n) ")) {
+            $g = new GenerateSymlinks($output, $rootPath, $project);
+            $g->process($output);
+        }
 
         $output->writeln('<header>Fini ? Ca joue le chalet ou bien ?</header>');
     }
