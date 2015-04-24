@@ -17,7 +17,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     public function testInstanceCanBeCreatedWithParams()
     {
         $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks($output, 'rootPath');
+        $instance = new GenerateSymlinks('rootPath', '*', $output);
 
         $this->assertInstanceOf('ConsoleTools\Symlink\Generator\GenerateSymlinks', $instance);
     }
@@ -46,7 +46,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     public function testCanTraverseDirs()
     {
         $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks($output, '../');
+        $instance = new GenerateSymlinks('../', '*', $output);
 
         $this->assertInternalType('array', $instance->getAllDirsToTraverse());
     }
@@ -54,7 +54,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     public function testGetProjectConfig()
     {
         $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks($output, '../', 'Linux');
+        $instance = new GenerateSymlinks('../', 'Linux', $output);
         
         $this->assertFalse($instance->getProjectConfig('Linux'));
     }

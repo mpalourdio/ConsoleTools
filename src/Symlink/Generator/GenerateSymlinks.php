@@ -22,10 +22,11 @@ class GenerateSymlinks
     const JSON_CONFIG_FILENAME = 'config.json';
 
     /**
-     * @param OutputInterface $output
      * @param                 $rootPath
+     * @param string          $projectDir
+     * @param OutputInterface $output
      */
-    public function __construct(OutputInterface $output = null, $rootPath, $projectDir = '*')
+    public function __construct($rootPath, $projectDir = '*', OutputInterface $output = null)
     {
         if (null === $rootPath) {
             throw new InvalidArgumentException('Vous devez spécifier la racine de Templates');

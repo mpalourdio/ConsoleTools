@@ -76,7 +76,7 @@ Utilisation:
         );
 
         if ($this->getHelper('dialog')->askConfirmation($output, "Continuer? (y/n) ")) {
-            $g = new GenerateSymlinks($output, $rootPath, $project);
+            $g = new GenerateSymlinks($rootPath, $project, $output);
             $g->process($output);
         }
 
