@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="TestJenkins" default="ci" basedir=".">
+    <property name="source" value="src"/>
+
+    <target name="ci"
+            description="Tâche principale d'intégration continue"
+            depends="clean,composer,qa"
+            />
+
+    <target name="clean" description="Vide les répertoires d'artefacts">
+        <delete dir="${project.basedir}/vendor"/>
+        <delete dir="${project.basedir}/build/coverage"/>
+        <delete dir="${project.basedir}/build/logs"/>
+        <delete dir="${project.basedir}/build/pdepend"/>
+
+        <mkdir dir="${project.basedir}/build/coverage"/>
+        <mkdir dir="${project.basedir}/build/logs"/>
+        <mkdir dir="${project.basedir}/build/pdepend"/>
+    </target>
+
+    <target name="composer">
+        <exec logoutput="true" command="composer update" escape="false"/>
+    </target>
+
+    <target name="qa" description="Lance les outils d'analyse">
+        <phingcall target="phpcs"/>
+        <phingcall target="phpunit"/>
+        <phingcall target="pdepend"/>
+        <phingcall target="phpmd"/>
+    </target>
+
+    <target name="phpunit">
+        <exec logoutput="true" command="${project.basedir}/vendor/bin/phpunit --coverage-clover=${project.basedir}/build/logs/clover.xml --coverage-html=${project.basedir}/build/coverage --log-junit=${project.basedir}/build/logs/junit.xml --coverage-crap4j=${project.basedir}/build/logs/crap4j.xml" escape="false"/>
+    </target>
+
+    <target name="phpcs">
+        <phpcodesniffer standard="PSR2">
+            <fileset dir="${project.basedir}">
+                <include name="src/**/*.php"/>
+                <include name="tests/**/*.php"/>
+            </fileset>
+            <formatter type="checkstyle" outfile="${project.basedir}/build/logs/checkstyle.xml"/>
+        </phpcodesniffer>
+    </target>
+
+    <target name="pdepend">
+        <phpdepend file="${project.basedir}/${source}">
+            <logger type="jdepend-xml" outfile="${project.basedir}/build/logs/jdepend.xml"/>
+            <logger type="jdepend-chart" outfile="${project.basedir}/build/pdepend/dependencies.svg"/>
+            <logger type="overview-pyramid" outfile="${project.basedir}/build/pdepend/overview-pyramid.svg"/>
+        </phpdepend>
+    </target>
+
+    <target name="phpmd">
+        <phpmd file="${project.basedir}/${source}">
+            <formatter type="xml" outfile="${project.basedir}/build/logs/phpmd.xml"/>
+        </phpmd>
+    </target>
+</project>
