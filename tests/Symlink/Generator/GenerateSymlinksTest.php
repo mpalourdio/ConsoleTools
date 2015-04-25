@@ -8,7 +8,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-namespace ConsoleToolsTests\Generator;
+namespace ConsoleToolsTests\Symlink\Generator;
 
 use ConsoleTools\Symlink\Generator\GenerateSymlinks;
 
