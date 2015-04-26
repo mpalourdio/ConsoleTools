@@ -5,6 +5,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Symfony\Component\Console\Application;
 use ConsoleTools\Symlink\Commands\GenerateSymlinksCommand;
 
-$app = new Application();
+$app = new Application('Converce', '@package_version@');
 $app->add(new GenerateSymlinksCommand());
 $app->run();
