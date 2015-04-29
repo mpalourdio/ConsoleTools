@@ -43,7 +43,7 @@ class GenerateSymlinks
     public function getAllDirsToTraverse()
     {
         $dir = new DirectoryIterator($this->templateDir);
-        if ($this->projectDir === '*') {
+        if ($this->projectDir === ['*']) {
             $allDirs = [];
             foreach ($dir as $fileinfo) {
                 if ($fileinfo->isDir() &&
