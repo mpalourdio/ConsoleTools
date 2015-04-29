@@ -76,8 +76,8 @@ Utilisation:
         );
 
         if ($this->getHelper('dialog')->askConfirmation($output, "Continuer? (y/n) ")) {
-            $g = new GenerateSymlinks($rootPath, $project, $output);
-            $g->process($output);
+            $generation = new GenerateSymlinks($rootPath, $project, $output);
+            $generation->process();
         }
 
         $output->writeln('<header>Fini ? Ca joue le chalet ou bien ?</header>');
