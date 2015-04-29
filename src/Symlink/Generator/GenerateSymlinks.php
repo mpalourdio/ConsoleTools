@@ -34,7 +34,7 @@ class GenerateSymlinks
 
         $this->projectDir  = $projectDir;
         $this->output      = $output;
-        $this->templateDir = $rootPath;
+        $this->templateDir = realpath($rootPath);
     }
 
     /**
