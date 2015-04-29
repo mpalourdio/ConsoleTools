@@ -46,7 +46,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     public function testCanTraverseDirs()
     {
         $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('../', '*', $output);
+        $instance = new GenerateSymlinks('../', ['*'], $output);
 
         $this->assertInternalType('array', $instance->getAllDirsToTraverse());
     }
