@@ -17,33 +17,35 @@ use Symfony\Component\Console\Output\OutputInterface;
 class GenerateSymlinks
 {
     private $templateDir;
-    private $projectDir;
+    private $projectDirs;
     private $output;
     const JSON_CONFIG_FILENAME = 'config.json';
 
     /**
-     * @param                 $rootPath
-     * @param string          $projectDir
-     * @param OutputInterface $output
+     * @param string          $rootPath    The path of the directory where projects are stores
+     * @param array           $projectDirs List of projects for which we want subfolders symlinks
+     * @param OutputInterface $output      Writes messages to console
      */
-    public function __construct($rootPath, $projectDir = '*', OutputInterface $output = null)
+    public function __construct($rootPath, $projectDirs = ['*'], OutputInterface $output = null)
     {
         if (null === $rootPath) {
             throw new InvalidArgumentException('Vous devez spécifier la racine de Templates');
         }
 
-        $this->projectDir  = $projectDir;
+        $this->projectDirs = $projectDirs;
         $this->output      = $output;
         $this->templateDir = realpath($rootPath);
     }
 
     /**
+     * Traverse and store all dirs from the specified root path
+     *
      * @return array
      */
     public function getAllDirsToTraverse()
     {
         $dir = new DirectoryIterator($this->templateDir);
-        if ($this->projectDir === ['*']) {
+        if ($this->projectDirs === ['*']) {
             $allDirs = [];
             foreach ($dir as $fileinfo) {
                 if ($fileinfo->isDir() &&
@@ -56,14 +58,17 @@ class GenerateSymlinks
             }
             sort($allDirs);
         } else {
-            $allDirs = $this->projectDir;
+            $allDirs = $this->projectDirs;
         }
 
         return $allDirs;
     }
 
     /**
-     * @param  $projectDir
+     * Read content of config.json if exists for the current fetched folder
+     *
+     * @param  string $projectDir The current folder we want config from
+     *
      * @return array
      */
     public function getProjectConfig($projectDir)
@@ -82,7 +87,9 @@ class GenerateSymlinks
     }
 
     /**
-     * return void
+     * Bootstrap the symlinks creation process
+     *
+     * @return void
      */
     public function process()
     {
@@ -96,10 +103,14 @@ class GenerateSymlinks
     }
 
     /**
-     * @param       $projectDir
-     * @param array $symlinksToCreate
+     * Grabs and treats sources and destinations paths
+     *
+     * @param string $projectDir
+     * @param array  $symlinksToCreate
+     *
+     * @return void
      */
-    private function prepareSymlinks($projectDir, array $symlinksToCreate)
+    public function prepareSymlinks($projectDir, array $symlinksToCreate)
     {
         foreach ($symlinksToCreate as $symlink) {
             if (! isset($symlink['dest'])) {
@@ -121,10 +132,14 @@ class GenerateSymlinks
     }
 
     /**
-     * @param $symlinkToCreate
-     * @param $sourceEntity
+     * Delete The symlink if exists and re-create it
+     *
+     * @param string $symlinkToCreate The symlink to create
+     * @param string $sourceEntity    The source from which create the symlink
+     *
+     * @return void
      */
-    private function createSymlinks($symlinkToCreate, $sourceEntity)
+    public function createSymlinks($symlinkToCreate, $sourceEntity)
     {
         //check if symlink exists
         if (is_link($symlinkToCreate)) {
