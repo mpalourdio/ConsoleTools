@@ -48,7 +48,8 @@ class GenerateSymlinks
             foreach ($dir as $fileinfo) {
                 if ($fileinfo->isDir() &&
                     ! $fileinfo->isDot() &&
-                    substr($fileinfo->getFilename(), 0, 1) != '.'
+                    substr($fileinfo->getFilename(), 0, 1) != '.' &&
+                    ! $fileinfo->isLink()
                 ) {
                     $allDirs[] = $fileinfo->getFilename();
                 }
