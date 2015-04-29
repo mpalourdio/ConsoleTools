@@ -22,12 +22,20 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('ConsoleTools\Symlink\Generator\GenerateSymlinks', $instance);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testRootPathIsMandatory()
+    {
+        new GenerateSymlinks(null);
+    }
+
     public function testProcessCanBeRan()
     {
         $mock = $this
             ->getMockBuilder('ConsoleTools\Symlink\Generator\GenerateSymlinks')
             ->disableOriginalConstructor()
-            ->setMethods(['getAllDirsToTraverse', 'getProjectConfig'])
+            ->setMethods(['getAllDirsToTraverse', 'getProjectConfig', 'prepareSymlinks'])
             ->getMock();
 
         $mock
@@ -39,6 +47,11 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getProjectConfig')
             ->willReturn([]);
+
+        $mock
+            ->expects($this->any())
+            ->method('prepareSymlinks')
+            ->willReturn(true);
 
         $this->assertNull($mock->process());
     }
@@ -54,8 +67,40 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     public function testGetProjectConfig()
     {
         $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('../', 'Linux', $output);
-        
+        $instance = new GenerateSymlinks('../', ['Linux'], $output);
+
         $this->assertFalse($instance->getProjectConfig('Linux'));
+    }
+
+    public function testNotStarDoesntTraverse()
+    {
+        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
+        $instance = new GenerateSymlinks('../', ['Symlink'], $output);
+
+        $this->assertEquals('Symlink', $instance->getAllDirsToTraverse()[0]);
+    }
+
+    public function testprepareSymlinks()
+    {
+        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
+        $instance = new GenerateSymlinks('../', ['Linux'], $output);
+
+        $this->assertTrue($instance->prepareSymlinks('Linux', [['source' => 'MacOS']]));
+    }
+
+    public function testCreateSymlinks()
+    {
+        $mock = $this
+            ->getMockBuilder('ConsoleTools\Symlink\Generator\GenerateSymlinks')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mock
+            ->expects($this->any())
+            ->method('createSymlinks')
+            ->withAnyParameters()
+            ->willReturn(false);
+
+        $this->assertFalse($mock->createSymlinks('foo', 'bar'));
     }
 }
