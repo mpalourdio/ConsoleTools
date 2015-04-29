@@ -76,9 +76,7 @@ class GenerateSymlinks
         $configFile =
             $this->templateDir . DIRECTORY_SEPARATOR . $projectDir . DIRECTORY_SEPARATOR . self::JSON_CONFIG_FILENAME;
         if (! file_exists($configFile)) {
-            $this->output->writeln(
-                '<error>config.json introuvable pour ' . $projectDir . '<error>'
-            );
+            $this->output->writeln('<error>config.json introuvable pour ' . $projectDir . '<error>');
 
             return false;
         }
@@ -108,7 +106,7 @@ class GenerateSymlinks
      * @param string $projectDir
      * @param array  $symlinksToCreate
      *
-     * @return void
+     * @return bool
      */
     public function prepareSymlinks($projectDir, array $symlinksToCreate)
     {
@@ -122,13 +120,13 @@ class GenerateSymlinks
                 $this->templateDir . DIRECTORY_SEPARATOR . $projectDir . DIRECTORY_SEPARATOR . $symlink['source'];
 
             if (! is_dir($sourceEntity) && ! file_exists($sourceEntity)) {
-                $this->output->writeln(
-                    '<error>' . $sourceEntity . ' n\'existe pas<error>'
-                );
+                $this->output->writeln('<error>' . $sourceEntity . ' n\'existe pas<error>');
             } else {
                 $this->createSymlinks($symlinkToCreate, $sourceEntity);
             }
         }
+
+        return true;
     }
 
     /**
@@ -137,24 +135,22 @@ class GenerateSymlinks
      * @param string $symlinkToCreate The symlink to create
      * @param string $sourceEntity    The source from which create the symlink
      *
-     * @return void
+     * @return bool
      */
     public function createSymlinks($symlinkToCreate, $sourceEntity)
     {
         //check if symlink exists
         if (is_link($symlinkToCreate)) {
             unlink($symlinkToCreate);
-            $this->output->writeln(
-                '<question>' . $symlinkToCreate . ' -> A recréer </question>'
-            );
+            $this->output->writeln('<question>' . $symlinkToCreate . ' -> A recréer </question>');
         }
 
-        symlink(
-            $sourceEntity,
-            $symlinkToCreate
-        );
-        $this->output->writeln(
-            '<info>' . $symlinkToCreate . ' -> OK <info>'
-        );
+        if (symlink($sourceEntity, $symlinkToCreate)) {
+            $this->output->writeln('<info>' . $symlinkToCreate . ' -> OK <info>');
+
+            return true;
+        }
+
+        return false;
     }
 }
