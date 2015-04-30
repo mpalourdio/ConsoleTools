@@ -16,27 +16,27 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateSymlinks
 {
-    private $templateDir;
+    private $source;
     private $projectDirs;
     private $destination;
     private $output;
     const JSON_CONFIG_FILENAME = 'config.json';
 
     /**
-     * @param string          $rootPath    The path of the directory where projects are stores
+     * @param string          $source      The path of the directory where projects are stores
      * @param string          $destination Folder in which the symlinks will be created
      * @param array           $projectDirs List of projects for which we want subfolders symlinks
      * @param OutputInterface $output      Writes messages to console
      */
-    public function __construct($rootPath, $destination, $projectDirs = ['*'], OutputInterface $output = null)
+    public function __construct($source, $destination, $projectDirs = ['*'], OutputInterface $output = null)
     {
-        if (null === $rootPath || null == $destination) {
+        if (null === $source || null == $destination) {
             throw new InvalidArgumentException(
                 'Vous devez spécifier la racine de Templates ET le chemin de destination'
             );
         }
 
-        $this->templateDir = realpath($rootPath);
+        $this->source      = realpath($source);
         $this->destination = realpath($destination);
         $this->projectDirs = $projectDirs;
         $this->output      = $output;
@@ -49,7 +49,7 @@ class GenerateSymlinks
      */
     public function getAllDirsToTraverse()
     {
-        $dir = new DirectoryIterator($this->templateDir);
+        $dir = new DirectoryIterator($this->source);
         if ($this->projectDirs === ['*']) {
             $allDirs = [];
             foreach ($dir as $fileinfo) {
@@ -79,7 +79,7 @@ class GenerateSymlinks
     public function getProjectConfig($projectDir)
     {
         $configFile =
-            $this->templateDir . DIRECTORY_SEPARATOR . $projectDir . DIRECTORY_SEPARATOR . self::JSON_CONFIG_FILENAME;
+            $this->source . DIRECTORY_SEPARATOR . $projectDir . DIRECTORY_SEPARATOR . self::JSON_CONFIG_FILENAME;
         if (! file_exists($configFile)) {
             $this->output->writeln('<error>config.json introuvable pour ' . $projectDir . '<error>');
 
@@ -122,7 +122,7 @@ class GenerateSymlinks
             $symlinkToCreate = $this->destination . DIRECTORY_SEPARATOR . $symlink['dest'];
 
             $sourceEntity =
-                $this->templateDir . DIRECTORY_SEPARATOR . $projectDir . DIRECTORY_SEPARATOR . $symlink['source'];
+                $this->source . DIRECTORY_SEPARATOR . $projectDir . DIRECTORY_SEPARATOR . $symlink['source'];
 
             if (! is_dir($sourceEntity) && ! file_exists($sourceEntity)) {
                 $this->output->writeln('<error>' . $sourceEntity . ' n\'existe pas<error>');
