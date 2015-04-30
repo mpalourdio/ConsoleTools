@@ -18,23 +18,28 @@ class GenerateSymlinks
 {
     private $templateDir;
     private $projectDirs;
+    private $destination;
     private $output;
     const JSON_CONFIG_FILENAME = 'config.json';
 
     /**
      * @param string          $rootPath    The path of the directory where projects are stores
+     * @param string          $destination Folder in which the symlinks will be created
      * @param array           $projectDirs List of projects for which we want subfolders symlinks
      * @param OutputInterface $output      Writes messages to console
      */
-    public function __construct($rootPath, $projectDirs = ['*'], OutputInterface $output = null)
+    public function __construct($rootPath, $destination, $projectDirs = ['*'], OutputInterface $output = null)
     {
-        if (null === $rootPath) {
-            throw new InvalidArgumentException('Vous devez spécifier la racine de Templates');
+        if (null === $rootPath || null == $destination) {
+            throw new InvalidArgumentException(
+                'Vous devez spécifier la racine de Templates ET le chemin de destination'
+            );
         }
 
+        $this->templateDir = realpath($rootPath);
+        $this->destination = realpath($destination);
         $this->projectDirs = $projectDirs;
         $this->output      = $output;
-        $this->templateDir = realpath($rootPath);
     }
 
     /**
@@ -114,7 +119,7 @@ class GenerateSymlinks
             if (! isset($symlink['dest'])) {
                 $symlink['dest'] = $symlink['source']; //source n'est pas mandatory
             }
-            $symlinkToCreate = $this->templateDir . DIRECTORY_SEPARATOR . $symlink['dest'];
+            $symlinkToCreate = $this->destination . DIRECTORY_SEPARATOR . $symlink['dest'];
 
             $sourceEntity =
                 $this->templateDir . DIRECTORY_SEPARATOR . $projectDir . DIRECTORY_SEPARATOR . $symlink['source'];

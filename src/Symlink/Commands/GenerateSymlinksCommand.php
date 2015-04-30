@@ -37,6 +37,12 @@ class GenerateSymlinksCommand extends Command
                     '"*" ou un/des répertoire(s) de projet',
                     ['*']
                 ),
+                new InputOption(
+                    'destination',
+                    'd',
+                    InputOption::VALUE_OPTIONAL,
+                    'destination des symlinks si les sources ne sont pas "templates"'
+                ),
             ])
             ->setHelp(
                 'Crée les symlinks pour les dossiers de templates d\'un ou des projets
@@ -61,8 +67,10 @@ Utilisation:
         $headerStyle = new OutputFormatterStyle('white', 'green', ['bold']);
         $output->getFormatter()->setStyle('header', $headerStyle);
 
-        $project  = $input->getOption('project');
-        $rootPath = $input->getOption('chemin');
+        $project     = $input->getOption('project');
+        $rootPath    = $input->getOption('chemin');
+        $destination = $input->getOption('destination');
+
         if ($rootPath === null) {
             throw new \Exception(
                 'Vous devez spécifier la racine de Templates avec l\'option "-c" ou "--chemin"'
@@ -75,8 +83,12 @@ Utilisation:
             . '</header>'
         );
 
+        if (null === $destination) {
+            $destination = $rootPath;
+        }
+
         if ($this->getHelper('dialog')->askConfirmation($output, "Continuer? (y/n) ")) {
-            $generation = new GenerateSymlinks($rootPath, $project, $output);
+            $generation = new GenerateSymlinks($rootPath, $destination, $project, $output);
             $generation->process();
         }
 
