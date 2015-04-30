@@ -27,13 +27,20 @@ class GenerateSymlinks
      * @param string          $destination Folder in which the symlinks will be created
      * @param array           $projectDirs List of projects for which we want subfolders symlinks
      * @param OutputInterface $output      Writes messages to console
+     *
+     * @throws \Exception
      */
+
     public function __construct($source, $destination, $projectDirs = ['*'], OutputInterface $output = null)
     {
         if (null === $source || null == $destination) {
             throw new InvalidArgumentException(
                 'Vous devez spécifier la racine de Templates ET le chemin de destination'
             );
+        }
+
+        if (!is_dir($destination)) {
+            throw new \Exception('La chemin de destination des symlinks est invalide');
         }
 
         $this->source      = realpath($source);

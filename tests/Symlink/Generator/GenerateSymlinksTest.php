@@ -17,9 +17,17 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     public function testInstanceCanBeCreatedWithParams()
     {
         $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('rootPath', '*', $output);
+        $instance = new GenerateSymlinks('rootPath', '../', ['*'], $output);
 
         $this->assertInstanceOf('ConsoleTools\Symlink\Generator\GenerateSymlinks', $instance);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testWrongDestFolderThrowsException()
+    {
+        new GenerateSymlinks('rootPath', 'destPath/');
     }
 
     /**
