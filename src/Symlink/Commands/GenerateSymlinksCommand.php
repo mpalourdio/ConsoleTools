@@ -22,7 +22,7 @@ class GenerateSymlinksCommand extends Command
     protected function configure()
     {
         $this->setName('symlink:generate')
-            ->setDescription("Création des liens symboliques pour \\Templates")
+            ->setDescription("Création des liens symboliques pour /templates")
             ->setDefinition([
                 new InputOption(
                     'source',
@@ -41,7 +41,7 @@ class GenerateSymlinksCommand extends Command
                     'destination',
                     'd',
                     InputOption::VALUE_OPTIONAL,
-                    'destination des symlinks si les sources ne sont pas "templates"'
+                    'destination des symlinks si les sources ne sont pas dans "/templates"'
                 ),
             ])
             ->setHelp(
@@ -50,7 +50,8 @@ class GenerateSymlinksCommand extends Command
 Utilisation:
 
 <info>app/console symlink:generate -p Gpecs -p Serac </info>
-<info>app/console symlink:generate -s ../Templates </info>'
+<info>app/console symlink:generate -s ../Templates </info>
+<info>app/console symlink:generate -s ../Templates -d /home/destination -p VaudCulture</info>'
             );
     }
 
