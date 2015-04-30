@@ -27,7 +27,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
      */
     public function testRootPathIsMandatory()
     {
-        new GenerateSymlinks(null);
+        new GenerateSymlinks(null, null);
     }
 
     public function testProcessCanBeRan()
@@ -59,7 +59,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     public function testCanTraverseDirs()
     {
         $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('../', ['*'], $output);
+        $instance = new GenerateSymlinks('../', '../', ['*'], $output);
 
         $this->assertInternalType('array', $instance->getAllDirsToTraverse());
     }
@@ -67,7 +67,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     public function testGetProjectConfig()
     {
         $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('../', ['Linux'], $output);
+        $instance = new GenerateSymlinks('../', '../', ['Linux'], $output);
 
         $this->assertFalse($instance->getProjectConfig('Linux'));
     }
@@ -75,7 +75,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     public function testNotStarDoesntTraverse()
     {
         $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('../', ['Symlink'], $output);
+        $instance = new GenerateSymlinks('../', '../', ['Symlink'], $output);
 
         $this->assertEquals('Symlink', $instance->getAllDirsToTraverse()[0]);
     }
@@ -83,7 +83,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     public function testprepareSymlinks()
     {
         $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('../', ['Linux'], $output);
+        $instance = new GenerateSymlinks('../', '../', ['Linux'], $output);
 
         $this->assertTrue($instance->prepareSymlinks('Linux', [['source' => 'MacOS']]));
     }

@@ -39,7 +39,7 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName(),
-            '-c'      => 'root',
+            '-s'      => 'root',
         ]);
 
         $this->assertRegExp('/Templates dir : root/', $commandTester->getDisplay());
@@ -84,7 +84,7 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName(),
-            '-c'      => 'root',
+            '-s'      => 'root',
             '-p'      => ['linux'],
         ]);
 
@@ -103,7 +103,7 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName(),
-            '-c'      => 'root',
+            '-s'      => 'root',
             '-p'      => ['linux', 'gnu'],
         ]);
 

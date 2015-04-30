@@ -50,7 +50,7 @@ class GenerateSymlinksCommand extends Command
 Utilisation:
 
 <info>app/console symlink:generate -p Gpecs -p Serac </info>
-<info>app/console symlink:generate -c ../Templates </info>'
+<info>app/console symlink:generate -s ../Templates </info>'
             );
     }
 
@@ -73,7 +73,7 @@ Utilisation:
 
         if ($source === null) {
             throw new \Exception(
-                'Vous devez spécifier la racine de Templates avec l\'option "-c" ou "--chemin"'
+                'Vous devez spécifier la racine de Templates avec l\'option "-s" ou "--source"'
             );
         }
 
