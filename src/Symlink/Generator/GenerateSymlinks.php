@@ -23,10 +23,10 @@ class GenerateSymlinks
     const JSON_CONFIG_FILENAME = 'config.json';
 
     /**
-     * @param string          $source      The path of the directory where projects are stores
+     * @param string          $source The path of the directory where projects are stores
      * @param string          $destination Folder in which the symlinks will be created
      * @param array           $projectDirs List of projects for which we want subfolders symlinks
-     * @param OutputInterface $output      Writes messages to console
+     * @param OutputInterface $output Writes messages to console
      *
      * @throws \Exception
      */
@@ -39,7 +39,7 @@ class GenerateSymlinks
             );
         }
 
-        if (!is_dir($destination)) {
+        if (! is_dir($destination)) {
             throw new \Exception('La chemin de destination des symlinks est invalide');
         }
 
@@ -145,15 +145,23 @@ class GenerateSymlinks
      * Delete The symlink if exists and re-create it
      *
      * @param string $symlinkToCreate The symlink to create
-     * @param string $sourceEntity    The source from which create the symlink
+     * @param string $sourceEntity The source from which create the symlink
      *
      * @return bool
      */
     public function createSymlinks($symlinkToCreate, $sourceEntity)
     {
         //check if symlink exists
-        if (is_link($symlinkToCreate)) {
+        $toRecreate = false;
+        if (is_link($symlinkToCreate) || is_file($symlinkToCreate)) {
             unlink($symlinkToCreate);
+            $toRecreate = true;
+        } elseif (is_dir($symlinkToCreate)) {
+            exec('rm -Rf ' . $symlinkToCreate);
+            $toRecreate = true;
+        }
+
+        if ($toRecreate) {
             $this->output->writeln('<question>' . $symlinkToCreate . ' -> A recréer </question>');
         }
 
