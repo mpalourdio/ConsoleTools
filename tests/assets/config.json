@@ -1,0 +1,10 @@
+{
+    "build": {
+        "symlinks": [
+            {
+                "source": "sourcedir",
+                "dest":   "destdir"
+            }
+        ]
+    }
+}
