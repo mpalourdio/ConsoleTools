@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Filesystem\Filesystem;
 
 class GenerateSymlinksCommand extends Command
 {
@@ -68,28 +69,31 @@ Utilisation:
         $headerStyle = new OutputFormatterStyle('white', 'green', ['bold']);
         $output->getFormatter()->setStyle('header', $headerStyle);
 
-        $project     = $input->getOption('project');
-        $source      = $input->getOption('source');
-        $destination = $input->getOption('destination');
+        $parameters = [
+            'projectDirs'  => $input->getOption('project'),
+            'source'      => $input->getOption('source'),
+            'destination' => $input->getOption('destination'),
+        ];
 
-        if ($source === null) {
+        if ($parameters['source'] === null) {
             throw new \Exception(
                 'Vous devez spécifier la racine de Templates avec l\'option "-s" ou "--source"'
             );
         }
 
         $output->writeln(
-            '<header>Génération des symlinks pour "' . implode(' && ', $project) . '" -> Templates dir : '
-            . $source
+            '<header>Génération des symlinks pour "' . implode(' && ', $parameters['projectDirs']) . '" -> Templates dir : '
+            . $parameters['source']
             . '</header>'
         );
 
-        if (null === $destination) {
-            $destination = $source;
+        if (null === $parameters['destination']) {
+            $parameters['destination'] = $parameters['source'];
         }
 
         if ($this->getHelper('dialog')->askConfirmation($output, "Continuer? (y/n) ")) {
-            $generation = new GenerateSymlinks($source, $destination, $project, $output);
+            $fileSystem = new Filesystem();
+            $generation = new GenerateSymlinks($fileSystem, $parameters, $output);
             $generation->process();
         }
 

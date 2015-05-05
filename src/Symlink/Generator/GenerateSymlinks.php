@@ -13,40 +13,40 @@ namespace ConsoleTools\Symlink\Generator;
 use DirectoryIterator;
 use Prophecy\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class GenerateSymlinks
 {
     private $source;
-    private $projectDirs;
     private $destination;
     private $output;
+    private $filesystem;
     const JSON_CONFIG_FILENAME = 'config.json';
 
     /**
-     * @param string          $source      The path of the directory where projects are stores
-     * @param string          $destination Folder in which the symlinks will be created
-     * @param array           $projectDirs List of projects for which we want subfolders symlinks
-     * @param OutputInterface $output      Writes messages to console
+     * @param Filesystem      $filesystem
+     * @param array           $parameters => contains source, destination, projects (array)
+     * @param OutputInterface $output     Writes messages to console
      *
      * @throws \Exception
      */
 
-    public function __construct($source, $destination, $projectDirs = ['*'], OutputInterface $output = null)
+    public function __construct(Filesystem $filesystem, $parameters, OutputInterface $output = null)
     {
-        if (null === $source || null == $destination) {
+        if (null === $parameters['source'] || null == $parameters['destination']) {
             throw new InvalidArgumentException(
                 'Vous devez spécifier la racine de Templates ET le chemin de destination'
             );
         }
-
-        if (! is_dir($destination)) {
+        if (! $filesystem->exists($parameters['destination'])) {
             throw new \Exception('La chemin de destination des symlinks est invalide');
         }
 
-        $this->source      = realpath($source);
-        $this->destination = realpath($destination);
-        $this->projectDirs = $projectDirs;
+        $this->source      = realpath($parameters['source']);
+        $this->destination = realpath($parameters['destination']);
+        $this->projectDirs = $parameters['projectDirs'];
         $this->output      = $output;
+        $this->filesystem  = $filesystem;
     }
 
     /**
@@ -87,7 +87,7 @@ class GenerateSymlinks
     {
         $configFile =
             $this->source . DIRECTORY_SEPARATOR . $projectDir . DIRECTORY_SEPARATOR . self::JSON_CONFIG_FILENAME;
-        if (! file_exists($configFile)) {
+        if (! $this->filesystem->exists($configFile)) {
             $this->output->writeln('<error>config.json introuvable pour ' . $projectDir . '<error>');
 
             return false;
@@ -131,7 +131,7 @@ class GenerateSymlinks
             $sourceEntity =
                 $this->source . DIRECTORY_SEPARATOR . $projectDir . DIRECTORY_SEPARATOR . $symlink['source'];
 
-            if (! is_dir($sourceEntity) && ! file_exists($sourceEntity)) {
+            if (! $this->filesystem->exists($sourceEntity)) {
                 $this->output->writeln('<error>' . $sourceEntity . ' n\'existe pas<error>');
             } else {
                 $this->createSymlinks($symlinkToCreate, $sourceEntity);
@@ -147,30 +147,17 @@ class GenerateSymlinks
      * @param string $symlinkToCreate The symlink to create
      * @param string $sourceEntity    The source from which create the symlink
      *
-     * @return bool
+     * @return void
      */
     public function createSymlinks($symlinkToCreate, $sourceEntity)
     {
-        //check if symlink exists
-        $toRecreate = false;
-        if (is_link($symlinkToCreate) || is_file($symlinkToCreate)) {
-            unlink($symlinkToCreate);
-            $toRecreate = true;
-        } elseif (is_dir($symlinkToCreate)) {
-            exec('rm -Rf ' . $symlinkToCreate);
-            $toRecreate = true;
-        }
+        if ($this->filesystem->exists($symlinkToCreate)) {
+            $this->filesystem->remove($symlinkToCreate);
 
-        if ($toRecreate) {
             $this->output->writeln('<question>' . $symlinkToCreate . ' -> A recréer </question>');
         }
 
-        if (symlink($sourceEntity, $symlinkToCreate)) {
-            $this->output->writeln('<info>' . $symlinkToCreate . ' -> OK <info>');
-
-            return true;
-        }
-
-        return false;
+        $this->filesystem->symlink($sourceEntity, $symlinkToCreate);
+        $this->output->writeln('<info>' . $symlinkToCreate . ' -> OK <info>');
     }
 }
