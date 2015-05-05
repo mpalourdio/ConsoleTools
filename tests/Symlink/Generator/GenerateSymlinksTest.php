@@ -16,8 +16,18 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
 {
     public function testInstanceCanBeCreatedWithParams()
     {
-        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('rootPath', '../', ['*'], $output);
+        $output     = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->exactly(1))->method('exists')->willReturn(true);
+        $instance = new GenerateSymlinks(
+            $filesystem,
+            [
+                'source'      => 'rootPath',
+                'destination' => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'projectDirs' => ['*'],
+            ],
+            $output
+        );
 
         $this->assertInstanceOf('ConsoleTools\Symlink\Generator\GenerateSymlinks', $instance);
     }
@@ -27,7 +37,9 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
      */
     public function testWrongDestFolderThrowsException()
     {
-        new GenerateSymlinks('rootPath', 'destPath/');
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->exactly(1))->method('exists')->willReturn(false);
+        new GenerateSymlinks($filesystem, ['source' => 'rootPath', 'destination' => 'destPath']);
     }
 
     /**
@@ -35,7 +47,148 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
      */
     public function testRootPathIsMandatory()
     {
-        new GenerateSymlinks(null, null);
+        $filesystem = $this->getMock('Symfony\Component\Filesystem\Filesystem');
+        new GenerateSymlinks($filesystem, ['source' => null]);
+    }
+
+    public function testCanTraverseDirsWithJoker()
+    {
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->exactly(1))->method('exists')->willReturn(true);
+        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $instance = new GenerateSymlinks(
+            $filesystem,
+            [
+                'source'      => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'destination' => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'projectDirs' => ['*'],
+            ],
+            $output
+        );
+
+        $this->assertInternalType('array', $instance->getAllDirsToTraverse());
+        $this->assertEquals('Commands', $instance->getAllDirsToTraverse()[0]);
+        $this->assertEquals('Generator', $instance->getAllDirsToTraverse()[1]);
+    }
+
+    public function testCanTraverseDirs()
+    {
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->exactly(1))->method('exists')->willReturn(true);
+        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $instance = new GenerateSymlinks(
+            $filesystem,
+            [
+                'source'      => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'destination' => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'projectDirs' => ['Linux'],
+            ],
+            $output
+        );
+
+        $this->assertInternalType('array', $instance->getAllDirsToTraverse());
+        $this->assertEquals('Linux', $instance->getAllDirsToTraverse()[0]);
+    }
+
+    public function testGetProjectConfigNoJsonFound()
+    {
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->at(0))->method('exists')->willReturn(true);
+        $filesystem->expects($this->at(1))->method('exists')->willReturn(false);
+        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+
+        $instance = new GenerateSymlinks(
+            $filesystem,
+            [
+                'source'      => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'destination' => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'projectDirs' => ['Linux'],
+            ],
+            $output
+        );
+
+        $this->assertFalse($instance->getProjectConfig('Linux'));
+    }
+
+    public function testGetProjectConfigJsonFound()
+    {
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->at(0))->method('exists')->willReturn(true);
+        $filesystem->expects($this->at(1))->method('exists')->willReturn(true);
+        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $instance = new GenerateSymlinks(
+            $filesystem,
+            [
+                'source'      => __DIR__ . DIRECTORY_SEPARATOR . '../../../tests',
+                'destination' => __DIR__ . DIRECTORY_SEPARATOR . '../../../tests',
+                'projectDirs' => ['assets'],
+            ],
+            $output
+        );
+
+        $this->assertInternalType('array', $instance->getProjectConfig('assets'));
+    }
+
+    public function testprepareSymlinksSourceDoesNotExist()
+    {
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->at(0))->method('exists')->willReturn(true);
+        $filesystem->expects($this->at(1))->method('exists')->willReturn(false);
+        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+
+        $instance = new GenerateSymlinks(
+            $filesystem,
+            [
+                'source'      => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'destination' => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'projectDirs' => ['Linux'],
+            ],
+            $output
+        );
+
+        $this->assertTrue($instance->prepareSymlinks('Linux', [['source' => 'MacOS']]));
+    }
+
+    public function testprepareSymlinksSourceExists()
+    {
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->at(0))->method('exists')->willReturn(true);
+        $filesystem->expects($this->at(1))->method('exists')->willReturn(true);
+        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+
+        $instance = new GenerateSymlinks(
+            $filesystem,
+            [
+                'source'      => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'destination' => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'projectDirs' => ['Linux'],
+            ],
+            $output
+        );
+
+        $this->assertTrue($instance->prepareSymlinks('Linux', [['source' => 'MacOS']]));
+    }
+
+    public function testCreateSymlinks()
+    {
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->at(0))->method('exists')->willReturn(true);
+        $filesystem->expects($this->at(1))->method('exists')->willReturn(true);
+        $filesystem->expects($this->at(0))->method('symlink')->willReturn(null);
+        $filesystem->expects($this->at(0))->method('remove')->willReturn(null);
+
+        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $instance = new GenerateSymlinks(
+            $filesystem,
+            [
+                'source'      => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'destination' => __DIR__ . DIRECTORY_SEPARATOR . '../',
+                'projectDirs' => ['Linux'],
+            ],
+            $output
+        );
+
+        $this->assertNull($instance->createSymlinks('foo', 'bar'));
     }
 
     public function testProcessCanBeRan()
@@ -49,66 +202,19 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
         $mock
             ->expects($this->any())
             ->method('getAllDirsToTraverse')
-            ->willReturn([]);
+            ->willReturn(['firstDir', 'SecondDir']);
 
         $mock
             ->expects($this->any())
             ->method('getProjectConfig')
-            ->willReturn([]);
+            ->willReturn(['build' => ['symlinks' => ['source' => 'source']]]);
 
         $mock
             ->expects($this->any())
             ->method('prepareSymlinks')
+            ->withAnyParameters()
             ->willReturn(true);
 
         $this->assertNull($mock->process());
-    }
-
-    public function testCanTraverseDirs()
-    {
-        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('../', '../', ['*'], $output);
-
-        $this->assertInternalType('array', $instance->getAllDirsToTraverse());
-    }
-
-    public function testGetProjectConfig()
-    {
-        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('../', '../', ['Linux'], $output);
-
-        $this->assertFalse($instance->getProjectConfig('Linux'));
-    }
-
-    public function testNotStarDoesntTraverse()
-    {
-        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('../', '../', ['Symlink'], $output);
-
-        $this->assertEquals('Symlink', $instance->getAllDirsToTraverse()[0]);
-    }
-
-    public function testprepareSymlinks()
-    {
-        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput', []);
-        $instance = new GenerateSymlinks('../', '../', ['Linux'], $output);
-
-        $this->assertTrue($instance->prepareSymlinks('Linux', [['source' => 'MacOS']]));
-    }
-
-    public function testCreateSymlinks()
-    {
-        $mock = $this
-            ->getMockBuilder('ConsoleTools\Symlink\Generator\GenerateSymlinks')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mock
-            ->expects($this->any())
-            ->method('createSymlinks')
-            ->withAnyParameters()
-            ->willReturn(false);
-
-        $this->assertFalse($mock->createSymlinks('foo', 'bar'));
     }
 }
