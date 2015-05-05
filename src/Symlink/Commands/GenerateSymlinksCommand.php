@@ -70,7 +70,7 @@ Utilisation:
         $output->getFormatter()->setStyle('header', $headerStyle);
 
         $parameters = [
-            'projectDirs'  => $input->getOption('project'),
+            'projectDirs' => $input->getOption('project'),
             'source'      => $input->getOption('source'),
             'destination' => $input->getOption('destination'),
         ];
@@ -82,9 +82,11 @@ Utilisation:
         }
 
         $output->writeln(
-            '<header>Génération des symlinks pour "' . implode(' && ', $parameters['projectDirs']) . '" -> Templates dir : '
-            . $parameters['source']
-            . '</header>'
+            '<header>Génération des symlinks pour "' .
+            implode(' && ', $parameters['projectDirs']) .
+            '" -> Templates dir : ' .
+            $parameters['source'] .
+            '</header>'
         );
 
         if (null === $parameters['destination']) {
