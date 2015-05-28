@@ -4,7 +4,7 @@
     "license":      "MIT",
     "keywords":     [
         "symfony",
-        "cpnsole",
+        "console",
         "cli"
     ],
     "homepage":     "https://github.com/mpalourdio/ConsoleTools",
