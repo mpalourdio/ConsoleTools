@@ -18,9 +18,9 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
 {
     private function getQuestionHelperMockSetToFalse()
     {
-        $dialog = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper', ['askConfirmation']);
+        $dialog = $this->getMock('Symfony\Component\Console\Helper\QuestionHelper', ['ask']);
         $dialog->expects($this->any())
-            ->method('askConfirmation')
+            ->method('ask')
             ->will($this->returnValue(false));
 
         return $dialog;
@@ -34,7 +34,7 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         $command = $application->find('symlink:generate');
 
 
-        $command->getHelperSet()->set($this->getQuestionHelperMockSetToFalse(), 'dialog');
+        $command->getHelperSet()->set($this->getQuestionHelperMockSetToFalse(), 'question');
 
         $commandTester = new CommandTester($command);
         $commandTester->execute([
@@ -66,7 +66,7 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         $application->add(new GenerateSymlinksCommand());
 
         $command = $application->find('symlink:generate');
-        $command->getHelperSet()->set($this->getQuestionHelperMockSetToFalse(), 'dialog');
+        $command->getHelperSet()->set($this->getQuestionHelperMockSetToFalse(), 'question');
 
         $symlink = $this
             ->getMockBuilder('ConsoleTools\Symlink\Generator\GenerateSymlinks')
@@ -98,7 +98,7 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         $application->add(new GenerateSymlinksCommand());
 
         $command = $application->find('symlink:generate');
-        $command->getHelperSet()->set($this->getQuestionHelperMockSetToFalse(), 'dialog');
+        $command->getHelperSet()->set($this->getQuestionHelperMockSetToFalse(), 'question');
 
         $commandTester = new CommandTester($command);
         $commandTester->execute([
