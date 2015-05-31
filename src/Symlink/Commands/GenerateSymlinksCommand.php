@@ -95,7 +95,7 @@ Utilisation:
         }
 
         $helper = $this->getHelper('question');
-        $question = new ConfirmationQuestion('Continuer? (y/n) ', true);
+        $question = new ConfirmationQuestion('Continuer? (y/n) ');
         if ($helper->ask($input, $output, $question)) {
             $fileSystem = new Filesystem();
             $generation = new GenerateSymlinks($fileSystem, $parameters, $output);
