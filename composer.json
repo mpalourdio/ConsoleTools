@@ -1,32 +1,32 @@
 {
-    "name":         "Cli Tools",
-    "description":  "Misc php-cli tools based on Symfony\\Console",
-    "license":      "MIT",
-    "keywords":     [
+    "name": "Cli Tools",
+    "description": "Misc php-cli tools based on Symfony\\Console",
+    "license": "MIT",
+    "keywords": [
         "symfony",
         "console",
         "cli"
     ],
-    "homepage":     "https://github.com/mpalourdio/ConsoleTools",
-    "authors":      [
+    "homepage": "https://github.com/mpalourdio/ConsoleTools",
+    "authors": [
         {
-            "name":     "@mpalourdio",
-            "email":    "mpalourdio@gmail.com",
+            "name": "@mpalourdio",
+            "email": "mpalourdio@gmail.com",
             "homepage": "https://github.com/mpalourdio"
         }
     ],
-    "require":      {
-        "php":                ">=5.4",
-        "symfony/console":    "~2.7",
+    "require": {
+        "php": ">=5.4",
+        "symfony/console": "~2.7",
         "symfony/filesystem": "~2.7"
     },
-    "autoload":     {
+    "autoload": {
         "psr-4": {
             "ConsoleTools\\": "src/"
         }
     },
-    "require-dev":  {
-        "phpunit/phpunit":           "~4.6",
+    "require-dev": {
+        "phpunit/phpunit": "~4.6",
         "squizlabs/php_codesniffer": "~2.3"
     },
     "autoload-dev": {
