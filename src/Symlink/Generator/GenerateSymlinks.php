@@ -42,11 +42,11 @@ class GenerateSymlinks
             throw new \Exception('La chemin de destination des symlinks est invalide');
         }
 
-        $this->source      = realpath($parameters['source']);
+        $this->source = realpath($parameters['source']);
         $this->destination = realpath($parameters['destination']);
         $this->projectDirs = $parameters['projectDirs'];
-        $this->output      = $output;
-        $this->filesystem  = $filesystem;
+        $this->output = $output;
+        $this->filesystem = $filesystem;
     }
 
     /**
@@ -117,15 +117,21 @@ class GenerateSymlinks
      *
      * @param string $projectDir
      * @param array  $symlinksToCreate
+     * @throws \Exception
      *
      * @return bool
      */
     public function prepareSymlinks($projectDir, array $symlinksToCreate)
     {
         foreach ($symlinksToCreate as $symlink) {
+            if (! isset($symlink['source']) || null == $symlink['source']) {
+                throw new \Exception('Attention, la source des symlinks n\'est pas renseignée dans le fichier json');
+            }
+
             if (! isset($symlink['dest'])) {
                 $symlink['dest'] = $symlink['source']; //source n'est pas mandatory
             }
+
             $symlinkToCreate = $this->destination . DIRECTORY_SEPARATOR . $symlink['dest'];
 
             $sourceEntity =

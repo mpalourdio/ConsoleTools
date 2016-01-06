@@ -16,7 +16,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
 {
     public function testInstanceCanBeCreatedWithParams()
     {
-        $output     = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
         $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
         $filesystem->expects($this->exactly(1))->method('exists')->willReturn(true);
         $instance = new GenerateSymlinks(
@@ -55,7 +55,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     {
         $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
         $filesystem->expects($this->exactly(1))->method('exists')->willReturn(true);
-        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
         $instance = new GenerateSymlinks(
             $filesystem,
             [
@@ -75,7 +75,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
     {
         $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
         $filesystem->expects($this->exactly(1))->method('exists')->willReturn(true);
-        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
         $instance = new GenerateSymlinks(
             $filesystem,
             [
@@ -115,7 +115,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
         $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
         $filesystem->expects($this->at(0))->method('exists')->willReturn(true);
         $filesystem->expects($this->at(1))->method('exists')->willReturn(true);
-        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
         $instance = new GenerateSymlinks(
             $filesystem,
             [
@@ -127,6 +127,48 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertInternalType('array', $instance->getProjectConfig('assets'));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testEmptySourceinJsonThrowsException()
+    {
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->at(0))->method('exists')->willReturn(true);
+        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $instance = new GenerateSymlinks(
+            $filesystem,
+            [
+                'source'      => __DIR__ . DIRECTORY_SEPARATOR . '../../../tests',
+                'destination' => __DIR__ . DIRECTORY_SEPARATOR . '../../../tests',
+                'projectDirs' => ['Linux'],
+            ],
+            $output
+        );
+
+        $instance->prepareSymlinks('Linux', [['source' => '']]);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testUnexistingSourceinJsonThrowsException()
+    {
+        $filesystem = $this->getMockBuilder('Symfony\Component\Filesystem\Filesystem')->getMock();
+        $filesystem->expects($this->at(0))->method('exists')->willReturn(true);
+        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $instance = new GenerateSymlinks(
+            $filesystem,
+            [
+                'source'      => __DIR__ . DIRECTORY_SEPARATOR . '../../../tests',
+                'destination' => __DIR__ . DIRECTORY_SEPARATOR . '../../../tests',
+                'projectDirs' => ['Linux'],
+            ],
+            $output
+        );
+
+        $instance->prepareSymlinks('Linux', [[]]);
     }
 
     public function testprepareSymlinksSourceDoesNotExist()
@@ -177,7 +219,7 @@ class GenerateSymlinksTest extends \PHPUnit_Framework_TestCase
         $filesystem->expects($this->at(0))->method('symlink')->willReturn(null);
         $filesystem->expects($this->at(0))->method('remove')->willReturn(null);
 
-        $output   = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
+        $output = $this->getMock('Symfony\Component\Console\Output\ConsoleOutput');
         $instance = new GenerateSymlinks(
             $filesystem,
             [
