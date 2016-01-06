@@ -66,7 +66,6 @@ Utilisation:
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $headerStyle = new OutputFormatterStyle('white', 'green', ['bold']);
         $output->getFormatter()->setStyle('header', $headerStyle);
 
