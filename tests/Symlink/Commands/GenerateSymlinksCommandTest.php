@@ -68,26 +68,12 @@ class GenerateSymlinksCommandTest extends \PHPUnit_Framework_TestCase
         $command = $application->find('symlink:generate');
         $command->getHelperSet()->set($this->getQuestionHelperMockSetToFalse(), 'question');
 
-        $symlink = $this
-            ->getMockBuilder('ConsoleTools\Symlink\Generator\GenerateSymlinks')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $symlink->expects($this->any())
-            ->method('process')
-            ->will($this->returnValue(true));
-
-        $symlink->expects($this->any())
-            ->method('getAllDirsToTraverse')
-            ->will($this->returnValue(true));
-
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'command' => $command->getName(),
             '-s'      => 'root',
             '-p'      => ['linux'],
         ]);
-
 
         $this->assertRegExp('/linux/', $commandTester->getDisplay());
     }
